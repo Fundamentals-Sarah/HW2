@@ -5,7 +5,7 @@ output: html_document
 
 # Applying functions in R
 
-Installing to tead Excel files:
+Installing to read Excel files:
 
 ```{r}
 # install.packages('rio')
@@ -14,134 +14,167 @@ Installing to tead Excel files:
 # reading data
 
 ```{r}
-# opening a file from a url (file in Excel), name it 'fragility23'
-linkGit="https://github.com/DACSS-Fundamentals/overview/raw/refs/heads/main/FSI-2023-DOWNLOAD.xlsx"
+# I use the below code to read the Excel spreadsheet from Github into my R notebook
+linkGit="https://github.com/Fundamentals-Sarah/HW2/raw/refs/heads/main/FSI-2023-DOWNLOAD.xlsx"
 
-# library(rio) # package needed
-fragility23=rio::import(file = linkGit) #object that will hold the result
+# I install the needed package, rio
+fragility23=rio::import(file = linkGit) 
 ```
 
 ```{r}
-str(fragility23)
+# I use the str function to give me a high-level overview of what my data frame contains for data
+str(fragility23) 
 ```
 
 ## Apply square root function?
 
 ```{r}
-# whole DF?
-sqrt(fragility23)
+# I ask R to produce a square root for the entire data frame, which it cannot do because non-numeric variables are in the data frame
+# sqrt(fragility23) - Submitting as a note because my R gives me an error when knitting to HTML as code
 ```
 
 ```{r}
-# several columns (only numerical)
-
-sqrt(fragility23[,4:5])
+# I ask R to produce a squareroot for all the numbers in columns 4 and 5, Total and Demographic Pressures. It can do this because these are numeric variables.
+sqrt(fragility23[,4:5]) 
 ```
 
 ```{r}
-# one column
-sqrt(fragility23$Total)
+# I ask R to produce the square root for numbers in just one column, column 4 for Total, by using not the column not but instead the column name.
+sqrt(fragility23$Total) 
 ```
 
 ```{r}
-# one value
-sqrt(fragility23$Total[1])
+# I ask R to produce the square root for the first value in column for Total
+sqrt(fragility23$Total[1]) 
 ```
 
 ## Applying **sum()**:
 
 ```{r}
-# sum everything
-sum(fragility23[,4:5])
+# I produce a sum of all numbers in columns 4 and 5.
+sum(fragility23[,4:5]) 
 ```
 
 ```{r}
-# sum by column
-print(apply(fragility23[,4:5],2,sum))
+# I use apply with the sum function to get a sum for column 4 and a sum for column 5. Apply allows me to apply the function to each of the columns separately.
+print(apply(fragility23[,4:5],2,sum)) 
 ```
 
 ```{r}
-#notice
-typeof(apply(fragility23[,4:5],2,sum))
+# I use the type of apply function to tell me what type of list or vector the data is for the output of sum of column 4 and the sum of column 5. If I do not see list in the output, then it is a type of vector.
+typeof(apply(fragility23[,4:5],2,sum)) 
 ```
 
-If you do not see **list**, then it is a vector. ⏫
-
 ```{r}
-# sum by row
-print(apply(fragility23[,4:5],1,sum))
+# I use print apply function to generate a sum of columns 4 and 5 by row.
+print(apply(fragility23[,4:5],1,sum)) 
 ```
 
 ### Apply by iterating:
 
 ```{r}
+# I use lapply to get the sum of columns 4 and the sum of column 5.
 print(lapply(fragility23[,4:5],sum))
 ```
 
 Notice output of **lapply**:
 
 ```{r}
+# I use type of to determine whether the output is a list or a vector. Because it is lapply, it only works by column, so it is a list.
 typeof(lapply(fragility23[,4:5],sum))
 ```
 
 ```{r}
+# I determine what kind of class lapply sum of columns 4 and 5 is. It is a list.
 class(lapply(fragility23[,4:5],sum))
 ```
 
 Notice output of **sapply**:
 
 ```{r}
+# I use sapply to generate again the sum of column 4 and the sum of column 5.
 print(sapply(fragility23[,4:5],sum))
 ```
 
 ```{r}
+#I want to know the class of the sapply output above - it is numeric, or a vector.
 class(sapply(fragility23[,4:5],sum))
 ```
 
-Similarly:
-
 ```{r}
+# I generate again the square root of all numbers in columns 4 and 5 using lapply.
 print(lapply(fragility23[,4:5],sqrt))
 ```
 
 ```{r}
+# I produce the class of output for lapply function above, and it is a list.
 class(lapply(fragility23[,4:5],sqrt))
 ```
 
 ```{r}
+# Here, I use sapply to generate the square root for each number in columns 4 and 5.
 print(sapply(fragility23[,4:5],sqrt))
 ```
 
 ```{r}
+# I assess the class of sapply output of square root for all numbers in column 4 and column 5, and it is a matrix.
 class(sapply(fragility23[,4:5],sqrt))
 ```
 
-Now our own function:
+# Using Own Functions
 
 ```{r}
-theOnesOK = function(DF_country_and_variable) {
-  variable_values <- DF_country_and_variable[,2]
-  avg_value <- mean(variable_values, na.rm = TRUE)
-  is_above <- ifelse(variable_values > avg_value, "Above Average", "Below/At Average")
-  DF_country_and_variable$Status <- is_above
+theOnesOK = function(DF_country_and_variable) { #I define the function name 
+  variable_values <- DF_country_and_variable[,2] # I define that two variables or columns should be pulled into this function
+  avg_value <- mean(variable_values, na.rm = TRUE) #I specify how to calculate the mean of the variable, specifying to include null values
+  is_above <- ifelse(variable_values > avg_value, "Above Average", "Below/At Average") #I define what counts as above average, otherwise it is below average
+  DF_country_and_variable$Status <- is_above #I specify a column of status for showing above and below average
   return(DF_country_and_variable)
-}
+  } 
+#I set the overall output for the function
 ```
 
 ```{r}
-theOnesOK(fragility23[,c('Country','S1: Demographic Pressures')])
+theOnesOK(fragility23[,c('Country','S1: Demographic Pressures')]) #I use the function defined above to generate a data frame that includes Country and Demographic Pressures, organized from highest to lowest, with a new column for status which shows above or below/at average
 ```
 
 ```{r}
-mystery=function(DF,positionsToUse,CountryColumn='Country'){
-  newDF=DF[,c(CountryColumn),drop = FALSE]
-  average='average'
-  newDF[,average]=apply(DF[,positionsToUse],1,mean,na.rm = TRUE)
+mystery=function(DF,positionsToUse,CountryColumn='Country'){ #I define a function named mystery that pulls in the Country column into the data frame
+  newDF=DF[,c(CountryColumn),drop = FALSE] #I specify that the data frame should not exclude any countries
+  average='average' #I define what average means
+  newDF[,average]=apply(DF[,positionsToUse],1,mean,na.rm = TRUE) #I specify that the new data frame should find the average including values that are null
   return(newDF[,c(CountryColumn,average)])
-}
+  } 
+# I define the overall output of Country and average for the data frame
 ```
-
+                    
 ```{r}
-mystery(fragility23,4:6)
+mystery(fragility23,4:6) # I apply the mystery function to produce a data frame that includes Country and also a new column for the average of columns 4, 5, and 6. 
+```
+# Exercise 1
+```{r}
+theOnesOK2 = function(DF, DFvariable, CountryColumn='Country') {
+  # I define the function name {
+  variable_values <- DF[,DFvariable] # I define the a new variable, DF variable
+  avg_value <- mean(variable_values, na.rm = TRUE) # I define that the average value is calculated by taking the mean of the variable values, including null values
+  is_above <- ifelse(variable_values > avg_value, "Above Average", "Below/At Average") # I define what counts as above average, otherwise the value falls below or at average
+  newname = paste('Status_on', DFvariable) # I define newname, where Status_on is added or concatenated to the DF variable
+  DF[,newname] <- is_above #I specify that the newname should be organized by average value
+  return(DF[,c(CountryColumn, newname)])
+  } 
+# I define the output of the data frame as the country column and the new name column
+
+# How does theOnesOK2 differ from the theOnesOK? We are pasting or concatenating Status to a column, instead of adding a new column for Status
 ```
 
+# Exercise 2
+```{r}
+mistery = function(DF, positionsToUse, CountryColumn='Country') { # I define a function named mistery that pulls in the Country column into the data frame
+  newDF = DF[,c(CountryColumn), drop = FALSE] # I specify that the data frame should not include any countries
+  average = 'average' # I define what the average means
+  newDF[,average] = apply(DF[,positionsToUse], 1, mean, na.rm = TRUE) # I specify that the new data frame should find the average including values that are null
+  return(newDF[,c(CountryColumn, average)])
+  }
+# I define the overall output of Country and average for the data frame
+
+```
