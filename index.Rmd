@@ -124,7 +124,8 @@ class(sapply(fragility23[,4:5],sqrt))
 # Using Own Functions
 
 ```{r}
-theOnesOK = function(DF_country_and_variable) { #I define the function name 
+#I define the function name 
+theOnesOK = function(DF_country_and_variable) { 
   variable_values <- DF_country_and_variable[,2] # I define that two variables or columns should be pulled into this function
   avg_value <- mean(variable_values, na.rm = TRUE) #I specify how to calculate the mean of the variable, specifying to include null values
   is_above <- ifelse(variable_values > avg_value, "Above Average", "Below/At Average") #I define what counts as above average, otherwise it is below average
@@ -135,7 +136,7 @@ theOnesOK = function(DF_country_and_variable) { #I define the function name
 ```
 
 ```{r}
-theOnesOK(fragility23[,c('Country','S1: Demographic Pressures')]) #I use the function defined above to generate a data frame that includes Country and Demographic Pressures, organized from highest to lowest, with a new column for status which shows above or below/at average
+theOnesOK(fragility23[,c('Country','S1: Demographic Pressures')])
 ```
 
 ```{r}
@@ -147,34 +148,46 @@ mystery=function(DF,positionsToUse,CountryColumn='Country'){ #I define a functio
   } 
 # I define the overall output of Country and average for the data frame
 ```
-                    
+
 ```{r}
 mystery(fragility23,4:6) # I apply the mystery function to produce a data frame that includes Country and also a new column for the average of columns 4, 5, and 6. 
 ```
 # Exercise 1
 ```{r}
+#I define the function theOnesOK2 which includes a variable and a Country column
 theOnesOK2 = function(DF, DFvariable, CountryColumn='Country') {
-  # I define the function name {
-  variable_values <- DF[,DFvariable] # I define the a new variable, DF variable
-  avg_value <- mean(variable_values, na.rm = TRUE) # I define that the average value is calculated by taking the mean of the variable values, including null values
-  is_above <- ifelse(variable_values > avg_value, "Above Average", "Below/At Average") # I define what counts as above average, otherwise the value falls below or at average
-  newname = paste('Status_on', DFvariable) # I define newname, where Status_on is added or concatenated to the DF variable
-  DF[,newname] <- is_above #I specify that the newname should be organized by average value
+  variable_values <- DF[,DFvariable]
+  #I create a new variable called variable values from DFvariable
+  avg_value <- mean(variable_values, na.rm = TRUE)
+  #I define the average value as the mean of variable values, including nulls within the mean calculation
+  is_above <- ifelse(variable_values > avg_value, "Above Average", "Below/At Average")
+  #I specify that values above the mean are considered Above Average, and all other values are Below/At Average
+  newname = paste('Status_on', DFvariable)
+  #I define newname, which will add or concatenate the character string 'Status_on' to the data in DFvariable
+  DF[,newname] <- is_above 
+  #I will apply is_above logic to newname
   return(DF[,c(CountryColumn, newname)])
-  } 
-# I define the output of the data frame as the country column and the new name column
+} #I specify the return of this function to include Country column and new name
+```
 
-# How does theOnesOK2 differ from the theOnesOK? We are pasting or concatenating Status to a column, instead of adding a new column for Status
+```{r}
+#As we can see below, theOnesOK2 differs from the theOnesOK by generating a column for Above Average / Below or At Average for Demographic Pressures, without showing those average calculations. The column name appends "Status_on" to the name of the variable being assessed - in this case, generating 'Status_on S1: Demographic Pressures'. The Country column is also automatically pulled in.
+theOnesOK2(fragility23, 'S1: Demographic Pressures')
 ```
 
 # Exercise 2
 ```{r}
-mistery = function(DF, positionsToUse, CountryColumn='Country') { # I define a function named mistery that pulls in the Country column into the data frame
-  newDF = DF[,c(CountryColumn), drop = FALSE] # I specify that the data frame should not include any countries
+#I define a function named mistery that pulls in the Country column into the data frame and defines certain columns to be pulled in as 'positionstoUse'
+mistery = function(DF, positionsToUse, CountryColumn='Country') { 
+  newDF = DF[,c(CountryColumn), drop = FALSE] # I specify that the data frame should not exclude any countries
   average = 'average' # I define what the average means
-  newDF[,average] = apply(DF[,positionsToUse], 1, mean, na.rm = TRUE) # I specify that the new data frame should find the average including values that are null
+  newDF[,average] = apply(DF[,positionsToUse], 1, mean, na.rm = TRUE) # I specify that the new data frame should find the average of columns in 'position to use', including values that are null, and present these in a column titled average
   return(newDF[,c(CountryColumn, average)])
   }
 # I define the overall output of Country and average for the data frame
+```
 
+```{r}
+#I create a data frame of mistery that shows the country and average for columns 5, 6, 7, 8 and 9. 
+mistery(fragility23, 5:9)
 ```
